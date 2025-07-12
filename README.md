@@ -28,3 +28,21 @@ Dentre as ações feitas nessa etapa podemos citar:
     - Modificar sinteticamente as proporções treino e teste na variável resposta.
     - Existem duas formas de fazer esse balanceamento: undersampling e oversampling
 - Aplicar filtros.
+
+### Explore
+Essa etapa é onde fazemos a Análise Exploratória de Dados (EDA), daqui para frente utilizamos apenas a base de treino.
+
+Através do nosso caso de exemplo, podemos observar por exemplo que os usuários mais engajados possuem menos chances de dar churn. Essa análise pôde ser feita através da tabela criada no seguinte código:
+```py
+df_analise = X_train
+df_analise[target] = y_train
+df_analise.groupby(by=target).agg(["mean","median"]).T 
+```
+Em que as variáveis relacionadas a engajamento possui uma média maior de "zeros". 
+
+Portanto, na prática, podemos entender que fazer uma EDA é simplesmente olhar para a distribuição das covariáveis dentro da nossa variável resposta.
+
+Em resumo, estamos conhecendo o dado através de:
+- Análise descritiva.
+- Análise Bivariada.
+- Identificação de Missings.
