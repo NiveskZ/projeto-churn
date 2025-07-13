@@ -1,0 +1,14 @@
+artifact_uri: mlflow-artifacts:/995784814356959606/4a972300219e411c8f1b6927ae5289ac/artifacts
+end_time: 1752433066996
+entry_point_name: ''
+experiment_id: '995784814356959606'
+lifecycle_stage: active
+run_id: 4a972300219e411c8f1b6927ae5289ac
+run_name: salty-stoat-769
+source_name: ''
+source_type: 4
+source_version: ''
+start_time: 1752433055488
+status: 3
+tags: []
+user_id: Kevin

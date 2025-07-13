@@ -1,0 +1,6 @@
+destination_id: m-dbc600d6332d4067b90405b2ac3cf81a
+destination_type: MODEL_OUTPUT
+source_id: m-dbc600d6332d4067b90405b2ac3cf81a
+source_type: RUN_OUTPUT
+step: 0
+tags: {}

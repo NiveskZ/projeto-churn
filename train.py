@@ -82,6 +82,7 @@ best_features
 # %%
 # Modify
 from feature_engine import discretisation, encoding
+from sklearn import pipeline
 
 # Modifica variáveis numéricas em valores discretos
 # Nesse modelo utilizamos a árvore de decisão para fazer a discretização
@@ -90,20 +91,10 @@ tree_discretization = discretisation.DecisionTreeDiscretiser(variables=best_feat
                                                              bin_output='bin_number', # Transforma cada nó da árvore em um bin
                                                              cv=3
                                                              )
-tree_discretization.fit(X_train[best_features],y_train)
-#%%
-X_train.head()
-# %%
-X_train_transform = tree_discretization.transform(X_train[best_features])
-X_train_transform
-# %%
 
 # OneHot
 onehot= encoding.OneHotEncoder(variables=best_features, ignore_format=True)
-onehot.fit(X_train_transform,y_train)
 
-X_train_transform = onehot.transform(X_train_transform)
-X_train_transform
 # %%
 
 """arvore_nova = tree.DecisionTreeClassifier(random_state=42)
@@ -114,41 +105,84 @@ arvore_nova.fit(X_train_transform,y_train)
 #%%
 # MODEL
 from sklearn import linear_model
+from sklearn import naive_bayes
+from sklearn import ensemble
 
-reg = linear_model.LogisticRegression(penalty=None, random_state=42)
-reg.fit(X_train_transform,y_train)
+# model = linear_model.LogisticRegression(penalty=None, random_state=42)
+# model = naive_bayes.BernoulliNB()
+#model = ensemble.RandomForestClassifier(random_state=42,
+#                                        min_samples_leaf=20,
+#                                        n_jobs=4,
+#                                        n_estimators=1000
+#                                        )
+
+model = ensemble.AdaBoostClassifier(random_state=42,
+                                    n_estimators=500,
+                                    learning_rate=0.01)
+
+model_pipeline = pipeline.Pipeline(
+    steps=[('Discretizar',tree_discretization),
+           ('OneHot', onehot),
+           ('Model',model)
+           ]
+)
+
+import mlflow
+
+mlflow.set_tracking_uri('http://127.0.0.1:5000')
+
+mlflow.set_experiment(experiment_name='churn_exp')
+
+with mlflow.start_run():
+    mlflow.sklearn.autolog()
+    model_pipeline.fit(X_train, y_train)
+    
+    from sklearn import metrics
+    # Previsão e métricas base de treino
+    y_train_predict = model_pipeline.predict(X_train)
+    y_train_proba = model_pipeline.predict_proba(X_train)[:,1]
+
+    acc_train = metrics.accuracy_score(y_train,y_train_predict)
+    auc_train = metrics.roc_auc_score(y_train,y_train_proba)
+    roc_train = metrics.roc_curve(y_train,y_train_proba)
+    print("Acurácia Treino:", acc_train)
+    print("AUC Treino:", auc_train)
+
+    # Previsão base de teste
+    #X_test_transform = tree_discretization.transform(X_test[best_features])
+    #X_test_transform = onehot.transform(X_test_transform)
+
+    y_test_predict = model_pipeline.predict(X_test)
+    y_test_proba = model_pipeline.predict_proba(X_test)[:,1]
+
+    acc_test = metrics.accuracy_score(y_test,y_test_predict)
+    auc_test = metrics.roc_auc_score(y_test,y_test_proba)
+    roc_teste = metrics.roc_curve(y_test,y_test_proba)
+    print("Acurácia Treino:", acc_test)
+    print("AUC Treino:", auc_test)
+
+    # Previsão out of time
+    #out_of_time_transform = tree_discretization.transform(out_of_time[best_features])
+    #out_of_time_transform = onehot.transform(out_of_time_transform)
+
+    y_oot_predict = model_pipeline.predict(out_of_time[features])
+    y_oot_proba = model_pipeline.predict_proba(out_of_time[features])[:,1]
+
+    acc_oot = metrics.accuracy_score(out_of_time[target],y_oot_predict)
+    auc_oot = metrics.roc_auc_score(out_of_time[target],y_oot_proba)
+    roc_oot = metrics.roc_curve(out_of_time[target],y_oot_proba)
+    print("Acurácia oot:", acc_oot)
+    print("AUC oot:", auc_oot)
 # %%
-from sklearn import metrics
-# Previsão e métricas base de treino
-y_train_predict = reg.predict(X_train_transform)
-y_train_proba = reg.predict_proba(X_train_transform)[:,1]
-
-acc_train = metrics.accuracy_score(y_train,y_train_predict)
-auc_train = metrics.roc_auc_score(y_train,y_train_proba)
-print("Acurácia Treino:", acc_train)
-print("AUC Treino:", auc_train)
-# %%
-# Previsão base de teste
-X_test_transform = tree_discretization.transform(X_test[best_features])
-X_test_transform = onehot.transform(X_test_transform)
-
-y_test_predict = reg.predict(X_test_transform)
-y_test_proba = reg.predict_proba(X_test_transform)[:,1]
-
-acc_test = metrics.accuracy_score(y_test,y_test_predict)
-auc_test = metrics.roc_auc_score(y_test,y_test_proba)
-print("Acurácia Treino:", acc_test)
-print("AUC Treino:", auc_test)
-# %%
-# Previsão out of time
-out_of_time_transform = tree_discretization.transform(out_of_time[best_features])
-out_of_time_transform = onehot.transform(out_of_time_transform)
-
-y_oot_predict = reg.predict(out_of_time_transform)
-y_oot_proba = reg.predict_proba(out_of_time_transform)[:,1]
-
-acc_oot = metrics.accuracy_score(out_of_time[target],y_oot_predict)
-auc_oot = metrics.roc_auc_score(out_of_time[target],y_oot_proba)
-print("Acurácia oot:", acc_oot)
-print("AUC oot:", auc_oot)
+# Plotando curva ROC
+plt.plot(roc_train[0],roc_train[1])
+plt.plot(roc_teste[0],roc_teste[1])
+plt.plot(roc_oot[0],roc_oot[1])
+plt.grid()
+plt.title("Curva ROC")
+plt.legend([
+    f"Treino: {100*auc_train:.2f}",
+    f"Teste: {100*auc_test:.2f}",
+    f"Out-Of-Time: {100*auc_oot:.2f}"
+])
 # %%

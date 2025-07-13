@@ -1,0 +1,6 @@
+artifact_location: mlflow-artifacts:/995784814356959606
+creation_time: 1752432488272
+experiment_id: '995784814356959606'
+last_update_time: 1752432488272
+lifecycle_stage: active
+name: churn_exp
