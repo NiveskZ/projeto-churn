@@ -81,9 +81,10 @@ best_features = feature_importance[feature_importance['acumulada'] < 0.96]['inde
 best_features
 # %%
 # Modify
-from feature_engine import discretisation
+from feature_engine import discretisation, encoding
 
 # Modifica variáveis numéricas em valores discretos
+# Nesse modelo utilizamos a árvore de decisão para fazer a discretização
 tree_discretization = discretisation.DecisionTreeDiscretiser(variables=best_features,
                                                              regression=False,
                                                              bin_output='bin_number', # Transforma cada nó da árvore em um bin
@@ -96,6 +97,21 @@ X_train.head()
 X_train_transform = tree_discretization.transform(X_train[best_features])
 X_train_transform
 # %%
+
+# OneHot
+onehot= encoding.OneHotEncoder(variables=best_features, ignore_format=True)
+onehot.fit(X_train_transform,y_train)
+
+X_train_transform = onehot.transform(X_train_transform)
+X_train_transform
+# %%
+
+"""arvore_nova = tree.DecisionTreeClassifier(random_state=42)
+arvore_nova.fit(X_train_transform,y_train)
+
+(pd.Series(arvore_nova.feature_importances_, index=X_train_transform.columns)
+ .sort_values(ascending=False))"""
+#%%
 # MODEL
 from sklearn import linear_model
 
@@ -114,6 +130,7 @@ print("AUC Treino:", auc_train)
 # %%
 # Previsão base de teste
 X_test_transform = tree_discretization.transform(X_test[best_features])
+X_test_transform = onehot.transform(X_test_transform)
 
 y_test_predict = reg.predict(X_test_transform)
 y_test_proba = reg.predict_proba(X_test_transform)[:,1]
@@ -125,6 +142,7 @@ print("AUC Treino:", auc_test)
 # %%
 # Previsão out of time
 out_of_time_transform = tree_discretization.transform(out_of_time[best_features])
+out_of_time_transform = onehot.transform(out_of_time_transform)
 
 y_oot_predict = reg.predict(out_of_time_transform)
 y_oot_proba = reg.predict_proba(out_of_time_transform)[:,1]
