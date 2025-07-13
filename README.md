@@ -3,6 +3,13 @@ Esse repositório foi criado com o objetivo de realizar o projeto de prever o Ch
 
 Aqui eu irei atualizar com minhas próprias anotações, tendo como foco principal destrinchar todas as tarefas feitas durante o curso gratuito de [Machine Learning 2025](https://github.com/TeoMeWhy/machine-learning-2025), feito também pelo Téo e disponibilizado [Aqui](https://www.youtube.com/playlist?list=PLvlkVRRKOYFR6_LmNcJliicNan2TYeFO2), recriar por conta própria a aplicação do framework **SEMMA** e entender seus passos principais.
 
+## Ferramentas utilizadas
+Durante todo o projeto foi utilizado a linguangem de programação **Python** e as seguintes bibliotecas:
+- [pandas](https://pandas.pydata.org/docs/user_guide/index.html): Para manipulação, exploração e análise dos dados.
+- [scikit-learn](https://scikit-learn.org/stable/): Seleção de amostragem, uso de métricas estatísticas e modelos de previsão.
+- [matplotlib](https://matplotlib.org/): plotagem de gráficos para análise de modelos.
+- [feature-engine](https://feature-engine.trainindata.com/en/latest/): Transformação e Modificação de variáveis
+
 ## Framework SEMMA
 SEMMA é um framework criado pela SAS que significa:
 
@@ -46,3 +53,19 @@ Em resumo, estamos conhecendo o dado através de:
 - Análise descritiva.
 - Análise Bivariada.
 - Identificação de Missings.
+
+### Modify
+Agora é onde fazemos as modificações das colunas do nosso dataset, seja criar colunas novas sendo transformação das antigas, seja transformar algum tipo de coluna antiga em um valor novo. Alguns exemplos:
+
+- Padronização: Colocar todas as variáveis na mesma escala.
+- Imputação de Missing: Observar dados faltantes e entender como completa-lo ou tratá-lo, a depender do caso.
+- Binning: Transformar variáveis numéricas em ordinal ou nominal.
+- Combinação
+
+### Model
+Aplicação dos resultados obtidos até aqui em algum modelo de predição ou estátistico:
+
+- Modelos Estatísticos: Cálculo de métricas (Acurácia, curva ROC, etc)
+- Modelos de Árvore: Árvores de Decisão, classificação, Regressão, etc.
+- Modelos de Vetor de Suporte.
+- Redes Neurais.
