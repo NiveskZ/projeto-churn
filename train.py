@@ -136,7 +136,7 @@ mlflow.set_experiment(experiment_name='churn_exp')
 with mlflow.start_run():
     mlflow.sklearn.autolog()
     model_pipeline.fit(X_train, y_train)
-    
+
     from sklearn import metrics
     # Previsão e métricas base de treino
     y_train_predict = model_pipeline.predict(X_train)
@@ -173,6 +173,15 @@ with mlflow.start_run():
     roc_oot = metrics.roc_curve(out_of_time[target],y_oot_proba)
     print("Acurácia oot:", acc_oot)
     print("AUC oot:", auc_oot)
+
+    mlflow.log_metrics({
+        "acc_train":acc_train,
+        "auc_train":auc_train,
+        "acc_test":acc_test,
+        "auc_test":auc_test,
+        "acc_oot": acc_oot,
+        "auc_oot": auc_oot
+    })
 # %%
 # Plotando curva ROC
 plt.plot(roc_train[0],roc_train[1])
