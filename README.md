@@ -69,3 +69,10 @@ Aplicação dos resultados obtidos até aqui em algum modelo de predição ou es
 - Modelos de Árvore: Árvores de Decisão, classificação, Regressão, etc.
 - Modelos de Vetor de Suporte.
 - Redes Neurais.
+
+### Assess
+Essa é a última etapa, onde avaliamos as métricas de acurácia do nosso modelo e sua utilidade. Aqui fazemos toques finais, podendo incluir:
+- Métricas de Ajuste
+- Decisão
+- Comparação
+- Serialização
