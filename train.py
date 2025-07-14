@@ -104,26 +104,38 @@ arvore_nova.fit(X_train_transform,y_train)
  .sort_values(ascending=False))"""
 #%%
 # MODEL
-from sklearn import linear_model
-from sklearn import naive_bayes
+#from sklearn import linear_model
+#from sklearn import naive_bayes
 from sklearn import ensemble
 
 # model = linear_model.LogisticRegression(penalty=None, random_state=42)
 # model = naive_bayes.BernoulliNB()
-#model = ensemble.RandomForestClassifier(random_state=42,
-#                                        min_samples_leaf=20,
-#                                        n_jobs=4,
-#                                        n_estimators=1000
-#                                        )
+model = ensemble.RandomForestClassifier(random_state=42,
+                                        n_jobs=2,
+                                       )
 
-model = ensemble.AdaBoostClassifier(random_state=42,
-                                    n_estimators=500,
-                                    learning_rate=0.01)
+#model = ensemble.AdaBoostClassifier(random_state=42,
+#                                    n_estimators=500,
+#                                    learning_rate=0.01)
+
+
+params = {
+    "min_samples_leaf":[15,20,25,30,50],
+    "n_estimators":[100,200,500,1000],
+    "criterion":['gini','entropy','log_loss']
+}
+
+grid = model_selection.GridSearchCV(model,
+                                    params,
+                                    cv=3,
+                                    scoring='roc_auc',
+                                    verbose=4)
+
 
 model_pipeline = pipeline.Pipeline(
     steps=[('Discretizar',tree_discretization),
            ('OneHot', onehot),
-           ('Model',model)
+           ('Grid',grid)
            ]
 )
 
@@ -135,12 +147,12 @@ mlflow.set_experiment(experiment_name='churn_exp')
 
 with mlflow.start_run():
     mlflow.sklearn.autolog()
-    model_pipeline.fit(X_train, y_train)
+    model_pipeline.fit(X_train[best_features], y_train)
 
     from sklearn import metrics
     # Previsão e métricas base de treino
-    y_train_predict = model_pipeline.predict(X_train)
-    y_train_proba = model_pipeline.predict_proba(X_train)[:,1]
+    y_train_predict = model_pipeline.predict(X_train[best_features])
+    y_train_proba = model_pipeline.predict_proba(X_train[best_features])[:,1]
 
     acc_train = metrics.accuracy_score(y_train,y_train_predict)
     auc_train = metrics.roc_auc_score(y_train,y_train_proba)
@@ -152,10 +164,10 @@ with mlflow.start_run():
     #X_test_transform = tree_discretization.transform(X_test[best_features])
     #X_test_transform = onehot.transform(X_test_transform)
 
-    y_test_predict = model_pipeline.predict(X_test)
-    y_test_proba = model_pipeline.predict_proba(X_test)[:,1]
+    y_test_predict = model_pipeline.predict(X_test[best_features])
+    y_test_proba = model_pipeline.predict_proba(X_test[best_features])[:,1]
 
-    acc_test = metrics.accuracy_score(y_test,y_test_predict)
+    acc_test = metrics.accuracy_score(y_test,y_test_predict) 
     auc_test = metrics.roc_auc_score(y_test,y_test_proba)
     roc_teste = metrics.roc_curve(y_test,y_test_proba)
     print("Acurácia Treino:", acc_test)
@@ -165,8 +177,8 @@ with mlflow.start_run():
     #out_of_time_transform = tree_discretization.transform(out_of_time[best_features])
     #out_of_time_transform = onehot.transform(out_of_time_transform)
 
-    y_oot_predict = model_pipeline.predict(out_of_time[features])
-    y_oot_proba = model_pipeline.predict_proba(out_of_time[features])[:,1]
+    y_oot_predict = model_pipeline.predict(out_of_time[best_features])
+    y_oot_proba = model_pipeline.predict_proba(out_of_time[best_features])[:,1]
 
     acc_oot = metrics.accuracy_score(out_of_time[target],y_oot_predict)
     auc_oot = metrics.roc_auc_score(out_of_time[target],y_oot_proba)
@@ -184,14 +196,30 @@ with mlflow.start_run():
     })
 # %%
 # Plotando curva ROC
+plt.figure(dpi=400)
 plt.plot(roc_train[0],roc_train[1])
 plt.plot(roc_teste[0],roc_teste[1])
 plt.plot(roc_oot[0],roc_oot[1])
-plt.grid()
+plt.grid(True)
+plt.ylabel("Sensibilidade")
+plt.xlabel("1 - Especificidade")
 plt.title("Curva ROC")
 plt.legend([
     f"Treino: {100*auc_train:.2f}",
     f"Teste: {100*auc_test:.2f}",
     f"Out-Of-Time: {100*auc_oot:.2f}"
 ])
+
+plt.show()
 # %%
+
+# Serialização
+
+model_df = pd.Series( { 
+    "model":model_pipeline,
+    "features":best_features
+    })
+
+model_df.to_pickle("model.pkl")
+# %%
+

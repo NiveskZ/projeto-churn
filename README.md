@@ -1,14 +1,19 @@
 # Projeto Churn de Usuários
+![Static Badge](https://img.shields.io/badge/status-complete-green)
+
 Esse repositório foi criado com o objetivo de realizar o projeto de prever o Churn de usuários do canal [TéoMeWhy](https://www.twitch.tv/teomewhy) utilizando os dados disponibilizado pelo próprio Téo na plataforma [Kaggle](https://www.kaggle.com/datasets/teocalvo/analytical-base-table-churn). 
 
 Aqui eu irei atualizar com minhas próprias anotações, tendo como foco principal destrinchar todas as tarefas feitas durante o curso gratuito de [Machine Learning 2025](https://github.com/TeoMeWhy/machine-learning-2025), feito também pelo Téo e disponibilizado [Aqui](https://www.youtube.com/playlist?list=PLvlkVRRKOYFR6_LmNcJliicNan2TYeFO2), recriar por conta própria a aplicação do framework **SEMMA** e entender seus passos principais.
+
+A idéia é utilizar como uma fonte de consulta e uma forma de avaliar minha evolução em projetos futuros. Portanto, o código fonte terá muitas anotações e comentarios. Uma boa oportunidade para entender oque está nesse README através de exemplos.
 
 ## Ferramentas utilizadas
 Durante todo o projeto foi utilizado a linguangem de programação **Python** e as seguintes bibliotecas:
 - [pandas](https://pandas.pydata.org/docs/user_guide/index.html): Para manipulação, exploração e análise dos dados.
 - [scikit-learn](https://scikit-learn.org/stable/): Seleção de amostragem, uso de métricas estatísticas e modelos de previsão.
 - [matplotlib](https://matplotlib.org/): plotagem de gráficos para análise de modelos.
-- [feature-engine](https://feature-engine.trainindata.com/en/latest/): Transformação e Modificação de variáveis
+- [feature-engine](https://feature-engine.trainindata.com/en/latest/): Transformação e Modificação de variáveis.
+- [MLFlow](https://mlflow.org/): Breve uso para conhecer a biblioteca e comparar, trackear e registrar modelos.
 
 ## Framework SEMMA
 SEMMA é um framework criado pela SAS que significa:
@@ -76,3 +81,18 @@ Essa é a última etapa, onde avaliamos as métricas de acurácia do nosso model
 - Decisão
 - Comparação
 - Serialização
+
+## Tuning (hiperparâmetros)
+Hiperparâmetros são as configurações externas que definimos antes do treinamento no modelo. Em particular são os responsáveis por influenciar seu processo de treinamento e desempenho.
+
+O ajuste de hiperparâmetros é a parte essencial de machine learning para construir o modelo ideal para o problema proposto.
+
+Alguns exemplos que de ajustes seria:
+- Quantidade de nós
+- Taxa de Aprendizado
+- Número de árvores (RandomForest)
+
+Entre outras possibilidades.
+
+### GridSearchCV
+o [GridSearchCV](https://scikit-learn.org/stable/modules/generated/sklearn.model_selection.GridSearchCV.html) é uma maneira de de fazer o ajuste de hiperparâmetros através de um modelo exaustivo que faz a combinação entre varios hiperparâmetros (em forma de Grid) para que se encontre a melhor. 
